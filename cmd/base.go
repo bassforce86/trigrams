@@ -5,7 +5,7 @@ import (
 )
 
 var base = &cobra.Command{
-	Use:     "main",
+	Use:     "trigram",
 	Short:   "Music Tribe Interview Task",
 	Long:    "A small CLI to learn / consume data from a text file and generate random text using trigrams",
 	Version: "0.0.1",
