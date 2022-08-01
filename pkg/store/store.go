@@ -62,7 +62,7 @@ func (store *TrigramMapStore) AddTrigram(trigram Trigram) {
 }
 
 // MakeText generates a random text with the trigrams present in the store.
-func (store *TrigramMapStore) MakeText(max int) string {
+func (store *TrigramMapStore) GenerateText(max int) string {
 	store.mutex.Lock()
 	defer store.mutex.Unlock()
 
@@ -74,6 +74,21 @@ func (store *TrigramMapStore) MakeText(max int) string {
 	}
 
 	for i := 0; i < max; i++ {
+		if i == max-1 {
+			// Choose the next word, except if we encountered a path with zero possibilities for the next word.
+			possibleNextWords := store.trigrams[last2Words[0]][last2Words[1]]
+			if len(possibleNextWords) == 0 {
+				break
+			}
+			nextWord := store.chooser.ChooseFinalWord(possibleNextWords)
+			text = append(text, nextWord)
+
+			// Update the last 2 words:
+			last2Words[0] = last2Words[1]
+			last2Words[1] = nextWord
+			break
+		}
+
 		if len(text) > 0 {
 			// Choose the next word, except if we encountered a path with zero possibilities for the next word.
 			possibleNextWords := store.trigrams[last2Words[0]][last2Words[1]]
@@ -98,4 +113,8 @@ func (store *TrigramMapStore) MakeText(max int) string {
 	}
 
 	return strings.Join(text, " ")
+}
+
+func (store *TrigramMapStore) Trigrams() TrigramMap {
+	return store.trigrams
 }
